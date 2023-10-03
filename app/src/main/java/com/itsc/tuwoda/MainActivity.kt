@@ -1,0 +1,187 @@
+package com.itsc.tuwoda
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.paint
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import com.itsc.tuwoda.ui.theme.MyFABWithText
+
+class MainActivity : ComponentActivity() {
+
+    val model = MyViewModel()
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            Scaffold(
+                bottomBar = {
+                    MyBottomBar(model = model)
+                },
+                content = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(it),
+                        contentAlignment = Alignment.TopEnd,
+                    ){
+                        MyFloatingActionButton(
+                            background = R.drawable.more,
+                            icon = R.drawable.morepoint,
+                            size = 50.dp
+                        )
+                    }
+                },
+                floatingActionButton = {
+                    Column(
+                        modifier = Modifier.offset(y = 25.dp),
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.TopEnd
+                        ) {
+                            if (model.stateRouting){
+                                MyFABWithText(
+                                    text = "Построить новый маршрут",
+                                    x = (-15).dp,
+                                    y = (-45).dp,
+                                    paddingCardHorizontal = 20.dp,
+                                    paddingTextHorizontal = 10.dp,
+                                    sizeButton = 45.dp,
+                                    backgroundButton = R.drawable.ellipsefull,
+                                    iconButton = R.drawable.plus,
+                                    colorBackgroundButton = R.color.blue_light_main,
+                                    colorBackgroundText = R.color.blue_light_main_alfa,
+                                    model = model
+                                )
+                                if(model.stateMapDialog){
+                                    var stateBeginPoint by remember {
+                                        mutableStateOf("")
+                                    }
+                                    var stateEndPoint by remember {
+                                        mutableStateOf("")
+                                    }
+                                    if (model.stateMapDialog){
+                                        AlertDialog(
+                                            containerColor = colorResource(id = R.color.blue_main_alfa),
+                                            onDismissRequest = { model.stateMapDialog = false },
+                                            confirmButton = {
+                                                Button(
+                                                    onClick = { /*TODO*/ }
+                                                ) {
+                                                    Text(text = "Построить")
+                                                }
+                                            },
+                                            dismissButton = {
+                                                Button(
+                                                    onClick = { /*TODO*/ }
+                                                ) {
+                                                    Text(text = "Назад")
+                                                }
+                                            },
+                                            text = {
+                                                Column(
+                                                    horizontalAlignment = Alignment.End
+                                                ) {
+                                                    Text(text = "Начальная точка")
+                                                    TextField(
+                                                        value = stateBeginPoint,
+                                                        onValueChange = {text ->
+                                                            stateBeginPoint = text
+                                                        },
+                                                        trailingIcon = {
+                                                            Icon(
+                                                                painter = painterResource(id = R.drawable.geoicon),
+                                                                contentDescription = "geoicon",
+                                                                modifier = Modifier.size(30.dp)
+                                                            )
+                                                        }
+                                                    )
+                                                    Text(text = "Конечная точка")
+                                                    TextField(
+                                                        value = stateEndPoint,
+                                                        onValueChange = {text ->
+                                                            stateEndPoint = text
+                                                        }
+                                                    )
+                                                }
+
+                                            },
+                                        )
+                                    }
+
+                                }
+                                MyFABWithText(
+                                    backgroundButton = R.drawable.ellipsefull,
+                                    iconButton = R.drawable.star,
+                                    colorBackgroundButton = R.color.blue_light_main,
+                                    colorBackgroundText = R.color.blue_light_main_alfa,
+                                    text = "Повторить маршрут",
+                                    sizeButton = 45.dp,
+                                    x = (-65).dp,
+                                    paddingCardHorizontal = 20.dp,
+                                    paddingTextHorizontal = 10.dp,
+                                )
+                            }
+                            MyFloatingActionButton(
+                                background = R.drawable.ellipsefull,
+                                icon = R.drawable.routing,
+                                padding = 5.dp,
+                                state = model.stateRouting,
+                                onState = {state ->
+                                    model.stateRouting = state
+                                }
+                            )
+                        }
+                        MyFloatingActionButton(
+                            background = R.drawable.ellipsefull,
+                            icon = R.drawable.geo,
+                            padding = 5.dp
+                        )
+                    }
+                },
+                floatingActionButtonPosition = FabPosition.End
+            )
+        }
+    }
+}
