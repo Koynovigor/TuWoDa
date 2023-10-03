@@ -138,6 +138,7 @@ class MainActivity : ComponentActivity() {
                                                         }
                                                     )
                                                     Text(text = "Конечная точка")
+
                                                     TextField(
                                                         value = stateEndPoint,
                                                         onValueChange = {text ->
