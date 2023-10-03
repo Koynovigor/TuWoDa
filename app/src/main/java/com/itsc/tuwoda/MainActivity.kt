@@ -1,10 +1,16 @@
 package com.itsc.tuwoda
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,6 +55,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,7 +64,11 @@ import com.itsc.tuwoda.ui.theme.MyFABWithText
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.location.FilteringMode
+import com.yandex.mapkit.location.Location
+import com.yandex.mapkit.location.LocationListener
 import com.yandex.mapkit.location.LocationManager
+import com.yandex.mapkit.location.LocationStatus
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.mapview.MapView
 
@@ -70,11 +81,98 @@ class MainActivity : ComponentActivity() {
     private lateinit var locationManager: LocationManager
     private lateinit var pLauncher: ActivityResultLauncher<String>
 
+    //region Permission func
+    private fun registerPermissionListener(){
+        pLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
+            if(it){
+                //mapViewModel?.goToMyLocation()
+            }
+            else{
+
+            }
+        }
+    }
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun doItAndCheckPermissions(
+        action:() -> Unit
+    ){
+        when{
+            (ContextCompat.checkSelfPermission(
+                this@MainActivity, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+                    &&
+                    ContextCompat.checkSelfPermission(
+                        this@MainActivity, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                    &&
+                    ContextCompat.checkSelfPermission(
+                        this@MainActivity, Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                    &&
+                    ContextCompat.checkSelfPermission(
+                        this@MainActivity, Manifest.permission.INTERNET
+                    ) == PackageManager.PERMISSION_GRANTED )-> {
+                action()
+            }
+            else -> {
+                pLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                pLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+                pLauncher.launch(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                pLauncher.launch(Manifest.permission.INTERNET)
+            }
+        }
+    }
+
+    //endregion
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         MapKitFactory.setApiKey("6dff37eb-e903-4f29-810f-c9eb8f494fe0")
         MapKitFactory.initialize(this)
+
+        locationManager = MapKitFactory.getInstance().createLocationManager()
+        //region locationManager Setting
+
+        locationManager.requestSingleUpdate(
+            object: LocationListener {
+                override fun onLocationUpdated(p0: Location) {
+                    mapViewModel?.setMyLocation(
+                        p0.position
+                    )
+                }
+
+                override fun onLocationStatusUpdated(p0: LocationStatus) {
+                    Toast(
+                        context,
+
+                        )
+                }
+            }
+        )
+
+        locationManager.subscribeForLocationUpdates(
+            50.0,
+            10,
+            50.0,
+            false,
+            FilteringMode.ON,
+            object: LocationListener {
+                override fun onLocationUpdated(p0: Location) {
+                    mapViewModel?.setMyLocation(
+                        p0.position
+                    )
+                }
+
+                override fun onLocationStatusUpdated(p0: LocationStatus) {
+                    Toast.makeText(context,"123", Toast.LENGTH_LONG).show()
+                }
+
+            }
+        )
+        //endregion
+
         setContent {
             context = LocalContext.current
             mapViewModel = viewModel<MapViewModel>(
@@ -100,8 +198,6 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             )
-
-
 
             Scaffold(
                 bottomBar = {
@@ -227,13 +323,29 @@ class MainActivity : ComponentActivity() {
                         MyFloatingActionButton(
                             background = R.drawable.ellipsefull,
                             icon = R.drawable.geo,
-                            padding = 5.dp
+                            padding = 5.dp,
+                            onClick = {
+                                doItAndCheckPermissions {
+                                    Toast.makeText(
+                                        this@MainActivity,
+                                        "place: ${
+                                            mapViewModel?.myGeolocationPlacemark?.geometry?.longitude.toString()
+
+                                        } : ${
+                                            mapViewModel?.myGeolocationPlacemark?.geometry?.latitude.toString()
+                                        }",
+                                        Toast.LENGTH_LONG)
+                                        .show()
+                                    mapViewModel?.goToMyLocation()
+                                }
+                            }
                         )
                     }
                 },
                 floatingActionButtonPosition = FabPosition.End
             )
         }
+        registerPermissionListener()
     }
 
     override fun onStop() {
