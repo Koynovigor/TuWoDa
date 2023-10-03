@@ -1,8 +1,10 @@
 package com.itsc.tuwoda
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,24 +44,71 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.test.ui.MapViewModel
 import com.itsc.tuwoda.ui.theme.MyFABWithText
+import com.yandex.mapkit.Animation
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.location.LocationManager
+import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.mapview.MapView
 
 class MainActivity : ComponentActivity() {
 
     val model = MyViewModel()
+    private var mapViewModel: MapViewModel? = null
+
+    private lateinit var context: Context
+    private lateinit var locationManager: LocationManager
+    private lateinit var pLauncher: ActivityResultLauncher<String>
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MapKitFactory.setApiKey("6dff37eb-e903-4f29-810f-c9eb8f494fe0")
+        MapKitFactory.initialize(this)
         setContent {
+            context = LocalContext.current
+            mapViewModel = viewModel<MapViewModel>(
+                factory = object : ViewModelProvider.Factory {
+                    override fun<T: ViewModel> create(modelClass: Class<T>): T{
+                        return MapViewModel(
+                            mapView = MapView(context).apply{
+                                this.map.move(
+                                    CameraPosition(
+                                        Point(
+                                            56.452387,
+                                            84.972267
+                                        ),
+                                        10.0f,
+                                        0.0f,
+                                        0.0f),
+                                    Animation(Animation.Type.SMOOTH, 0f),
+                                    null
+                                )
+                            },
+                            context = context
+                        ) as T
+                    }
+                }
+            )
+
+
+
             Scaffold(
                 bottomBar = {
                     MyBottomBar(model = model)
                 },
                 content = {
+                    YandexMap(modifier = Modifier)
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -184,5 +234,30 @@ class MainActivity : ComponentActivity() {
                 floatingActionButtonPosition = FabPosition.End
             )
         }
+    }
+
+    override fun onStop() {
+        mapViewModel?.mapView?.onStop()
+        MapKitFactory.getInstance().onStop()
+        super.onStop()
+    }
+
+    override fun onStart() {
+        mapViewModel?.mapView?.onStart()
+        MapKitFactory.getInstance().onStart()
+        super.onStart()
+    }
+
+    @Composable
+    fun YandexMap(modifier: Modifier = Modifier) {
+        AndroidView(
+            modifier = modifier.fillMaxSize(),
+            factory = {
+                mapViewModel!!.mapView
+            },
+            update = {
+                mapViewModel!!.mapView
+            }
+        )
     }
 }
