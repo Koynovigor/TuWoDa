@@ -3,54 +3,27 @@ package com.itsc.tuwoda
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.itsc.tuwoda.ui.theme.MyFABWithText
 
 class MainActivity : ComponentActivity() {
 
-    val model = MyViewModel()
+    private val model = MyViewModel()
 
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,12 +70,6 @@ class MainActivity : ComponentActivity() {
                                     model = model
                                 )
                                 if(model.stateMapDialog){
-                                    var stateBeginPoint by remember {
-                                        mutableStateOf("")
-                                    }
-                                    var stateEndPoint by remember {
-                                        mutableStateOf("")
-                                    }
                                     if (model.stateMapDialog){
                                         AlertDialog(
                                             containerColor = colorResource(id = R.color.blue_main_alfa),
@@ -122,56 +89,23 @@ class MainActivity : ComponentActivity() {
                                                 }
                                             },
                                             text = {
-                                                Column(
-                                                ) {
-                                                    Text(
-                                                        text = "Начальная точка",
-                                                        color = Color.White,
-                                                        modifier = Modifier.offset(x = 15.dp)
+                                                Column {
+                                                    ItemDialog(
+                                                        name = "Начальная точка",
+                                                        colorName = Color.White,
+                                                        state = model.stateTextName,
+                                                        onState = {state ->
+                                                            model.stateTextName = state
+                                                        }
                                                     )
-                                                    Card(
-                                                        shape = RoundedCornerShape(100.dp)
-                                                    ) {
-                                                        TextField(
-                                                            value = stateBeginPoint,
-                                                            onValueChange = {text ->
-                                                                stateBeginPoint = text
-                                                            },
-                                                            trailingIcon = {
-                                                                MyFloatingActionButton(
-                                                                    background = R.drawable.ellipsefull,
-                                                                    icon = R.drawable.geoicon,
-                                                                    size = 50.dp,
-                                                                    scaleX = (-5).dp,
-                                                                    color = R.color.blue_main_alfa
-                                                                )
-                                                            }
-                                                        )
-                                                    }
-                                                    Text(
-                                                        text = "Конечная точка",
-                                                        color = Color.White,
-                                                        modifier = Modifier.offset(x = 15.dp)
+                                                    ItemDialog(
+                                                        name = "Конечная точка",
+                                                        colorName = Color.White,
+                                                        state = model.stateTextTitle,
+                                                        onState = {state ->
+                                                            model.stateTextTitle = state
+                                                        }
                                                     )
-                                                    Card(
-                                                        shape = RoundedCornerShape(100.dp)
-                                                    ) {
-                                                        TextField(
-                                                            value = stateEndPoint,
-                                                            onValueChange = {text ->
-                                                                stateEndPoint = text
-                                                            },
-                                                            trailingIcon = {
-                                                                MyFloatingActionButton(
-                                                                    background = R.drawable.ellipsefull,
-                                                                    icon = R.drawable.geoicon,
-                                                                    size = 50.dp,
-                                                                    scaleX = (-5).dp,
-                                                                    color = R.color.blue_main_alfa
-                                                                )
-                                                            }
-                                                        )
-                                                    }
                                                 }
 
                                             },

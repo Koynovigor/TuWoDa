@@ -15,6 +15,10 @@ class MyViewModel:ViewModel() {
     var stateRouting by mutableStateOf(false)
     var stateMapDialog by mutableStateOf(false)
 
+    var stateTextName by mutableStateOf("")
+    var stateTextTitle by mutableStateOf("")
+
+
     fun updateStateMap() {
         stateMap = true
         stateMe = false
