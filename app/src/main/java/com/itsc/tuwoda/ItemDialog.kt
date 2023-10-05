@@ -1,5 +1,7 @@
 package com.itsc.tuwoda
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -21,12 +23,14 @@ fun ItemDialog(
     onState: (String) -> Unit,
     state: String,
 ) {
-    Text(
-        text = name,
-        color = colorName,
-        modifier = Modifier.offset(x = 15.dp)
-    )
-
+    Column(
+        Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = name,
+            color = colorName,
+            modifier = Modifier.offset(x = 15.dp)
+        )
         TextField(
             value = state,
             onValueChange = {text ->
@@ -38,13 +42,16 @@ fun ItemDialog(
                     icon = R.drawable.geoicon,
                     size = 50.dp,
                     scaleX = (-5).dp,
-                    color = R.color.blue_main_alfa
+                    colorBackground = R.color.blue_main_alfa
                 )
             },
             shape = RoundedCornerShape(100.dp),
             colors = TextFieldDefaults.textFieldColors(
-                focusedIndicatorColor = Color.Transparent
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                containerColor = Color.White
             )
         )
+    }
 
 }

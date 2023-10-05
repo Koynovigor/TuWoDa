@@ -31,7 +31,8 @@ fun MyFloatingActionButton(
     scaleY: Dp = 0.dp,
     onState: (Boolean) -> Unit = {},
     state: Boolean = false,
-    color: Int = R.color.blue_main,
+    colorBackground: Int = R.color.blue_main,
+    tint: Color = Color.White
 ) {
     FloatingActionButton(
         onClick = {
@@ -42,22 +43,28 @@ fun MyFloatingActionButton(
             .padding(padding)
             .background(Color.Transparent)
             .size(size)
-            .paint(
+            /*.paint(
                 painter = painterResource(id = background),
                 contentScale = ContentScale.Crop,
-                colorFilter = ColorFilter.tint(colorResource(id = color))
-            ),
+                colorFilter = ColorFilter.tint(colorResource(id = colorBackground)),
+            ),*/,
         containerColor = Color.Transparent,
         contentColor = Color.Transparent,
         elevation = FloatingActionButtonDefaults.elevation(0.dp),
         ) {
         Icon(
+            painter = painterResource(id = background),
+            contentDescription = "backButtonFloat",
+            tint = colorResource(id = colorBackground)
+        )
+
+        Icon(
             painter = painterResource(id = icon),
             contentDescription = "moreVert",
-            tint = Color.White,
+            tint = tint,
             modifier = Modifier
                 .padding(padding)
-                .size(30.dp)
+                .size(size * 0.6f)
                 .background(Color.Transparent)
         )
     }

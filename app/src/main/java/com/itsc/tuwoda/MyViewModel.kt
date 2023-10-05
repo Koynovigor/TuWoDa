@@ -17,6 +17,11 @@ class MyViewModel:ViewModel() {
 
     var stateTextName by mutableStateOf("")
     var stateTextTitle by mutableStateOf("")
+    var stateTextTitleSailing by mutableStateOf("")
+    var stateTextTitleRoutes by mutableStateOf("56.616055, 84.767233")
+    var stateTextTitleRoutes1 by mutableStateOf("56.582062, 84.902435")
+
+    var stateTextTitleMe by mutableStateOf("")
 
 
     fun updateStateMap() {

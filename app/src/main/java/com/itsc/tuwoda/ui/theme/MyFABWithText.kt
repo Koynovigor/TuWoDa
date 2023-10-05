@@ -72,7 +72,7 @@ fun MyFABWithText(
         MyFloatingActionButton(
             background = backgroundButton,
             icon = iconButton,
-            color = colorBackgroundButton,
+            colorBackground = colorBackgroundButton,
             size = sizeButton,
             state = model.stateMapDialog,
             onState = {state ->
